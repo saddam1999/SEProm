@@ -15,27 +15,22 @@
   <component name="ExecutionTargetManager" SELECTED_TARGET="default_target" />
   <component name="FileEditorManager">
     <leaf>
-      <file leaf-file-name="main.py" pinned="false" current-in-tab="true">
+      <file leaf-file-name="main.py" pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/main.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="187">
-              <caret line="11" column="0" lean-forward="true" selection-start-line="11" selection-start-column="0" selection-end-line="11" selection-end-column="0" />
+            <state relative-caret-position="228">
+              <caret line="14" column="26" lean-forward="true" selection-start-line="14" selection-start-column="26" selection-end-line="14" selection-end-column="26" />
               <folding />
             </state>
           </provider>
         </entry>
       </file>
-      <file leaf-file-name="getParameterDetails.py" pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/src/getParameterDetails.py">
+      <file leaf-file-name="pcaRegressionAlgorithm.py" pinned="false" current-in-tab="true">
+        <entry file="file://$PROJECT_DIR$/src/pcaRegressionAlgorithm.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="148">
-              <caret line="769" column="30" lean-forward="false" selection-start-line="769" selection-start-column="29" selection-end-line="769" selection-end-column="30" />
-              <folding>
-                <element signature="e#1609#2536#0" expanded="false" />
-                <element signature="e#2587#3081#0" expanded="false" />
-                <element signature="e#3139#3534#0" expanded="false" />
-                <element signature="e#3570#22109#0" expanded="false" />
-              </folding>
+            <state relative-caret-position="264">
+              <caret line="85" column="45" lean-forward="false" selection-start-line="85" selection-start-column="38" selection-end-line="85" selection-end-column="45" />
+              <folding />
             </state>
           </provider>
         </entry>
@@ -53,11 +48,18 @@
     <findStrings>
       <find>= 0</find>
       <find>a</find>
-      <find>;</find>
-      <find>:</find>
-      <find>parameters</find>
       <find>pi</find>
       <find>%</find>
+      <find>,</find>
+      <find>v, w, y</find>
+      <find>v,x,w,y</find>
+      <find>moving_win_size</find>
+      <find>,</find>
+      <find>parameters</find>
+      <find>combineStructEnergyParams</find>
+      <find>;</find>
+      <find>:</find>
+      <find>constants.</find>
     </findStrings>
     <replaceStrings>
       <replace>/n</replace>
@@ -65,12 +67,15 @@
       <replace>h</replace>
       <replace>i</replace>
       <replace>j</replace>
-      <replace>k</replace>
       <replace>l</replace>
       <replace>f</replace>
-      <replace>=</replace>
       <replace>3.14</replace>
       <replace>#</replace>
+      <replace>=</replace>
+      <replace>v, w, x, y</replace>
+      <replace>k</replace>
+      <replace>=</replace>
+      <replace>append</replace>
     </replaceStrings>
   </component>
   <component name="IdeDocumentHistory">
@@ -78,11 +83,12 @@
       <list>
         <option value="$PROJECT_DIR$/readSequenceFile.py" />
         <option value="$PROJECT_DIR$/src/readSequenceFile.py" />
-        <option value="$PROJECT_DIR$/src/getParameterDetails.py" />
         <option value="$PROJECT_DIR$/../../VoxelGrids/Python_gfeRecon/recon_data.json" />
         <option value="$PROJECT_DIR$/../../VoxelGrids/Python_gfeRecon/supportFiles/fermi.py" />
         <option value="$PROJECT_DIR$/../../VoxelGrids/Python_gfeRecon/gfeRecon_test_average_python.py" />
+        <option value="$PROJECT_DIR$/src/getParameterDetails.py" />
         <option value="$PROJECT_DIR$/main.py" />
+        <option value="$PROJECT_DIR$/src/pcaRegressionAlgorithm.py" />
       </list>
     </option>
   </component>
@@ -406,7 +412,7 @@
     <layout>
       <window_info id="Project" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" show_stripe_button="true" weight="0.24981412" sideWeight="0.5" order="0" side_tool="false" content_ui="combo" />
       <window_info id="TODO" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="6" side_tool="false" content_ui="tabs" />
-      <window_info id="Event Log" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" show_stripe_button="true" weight="0.33560476" sideWeight="0.5026022" order="-1" side_tool="true" content_ui="tabs" />
+      <window_info id="Event Log" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33560476" sideWeight="0.5026022" order="-1" side_tool="true" content_ui="tabs" />
       <window_info id="Version Control" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="false" weight="0.33" sideWeight="0.5" order="-1" side_tool="false" content_ui="tabs" />
       <window_info id="Python Console" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="-1" side_tool="false" content_ui="tabs" />
       <window_info id="Run" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" show_stripe_button="true" weight="0.33560476" sideWeight="0.49739778" order="2" side_tool="false" content_ui="tabs" />
@@ -486,21 +492,32 @@
     </entry>
     <entry file="file://$PROJECT_DIR$/src/getParameterDetails.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="148">
-          <caret line="769" column="30" lean-forward="false" selection-start-line="769" selection-start-column="29" selection-end-line="769" selection-end-column="30" />
+        <state relative-caret-position="187">
+          <caret line="11" column="27" lean-forward="true" selection-start-line="11" selection-start-column="27" selection-end-line="11" selection-end-column="27" />
           <folding>
-            <element signature="e#1609#2536#0" expanded="false" />
-            <element signature="e#2587#3081#0" expanded="false" />
-            <element signature="e#3139#3534#0" expanded="false" />
-            <element signature="e#3570#22109#0" expanded="false" />
+            <element signature="e#0#27#0" expanded="true" />
+            <element signature="e#1892#2819#0" expanded="false" />
+            <element signature="e#2870#3400#0" expanded="false" />
+            <element signature="e#3458#3944#0" expanded="false" />
+            <element signature="e#3980#22543#0" expanded="false" />
+            <element signature="e#22592#22970#0" expanded="false" />
+            <element signature="e#23021#23458#0" expanded="false" />
           </folding>
         </state>
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/main.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="187">
-          <caret line="11" column="0" lean-forward="true" selection-start-line="11" selection-start-column="0" selection-end-line="11" selection-end-column="0" />
+        <state relative-caret-position="228">
+          <caret line="14" column="26" lean-forward="true" selection-start-line="14" selection-start-column="26" selection-end-line="14" selection-end-column="26" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/pcaRegressionAlgorithm.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="264">
+          <caret line="85" column="45" lean-forward="false" selection-start-line="85" selection-start-column="38" selection-end-line="85" selection-end-column="45" />
           <folding />
         </state>
       </provider>
