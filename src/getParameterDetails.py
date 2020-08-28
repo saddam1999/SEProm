@@ -1,6 +1,3 @@
-import src.readSequenceFile
-import sys
-
 parameters = {
     'values_map':{},
     'moving_averages_map': {},
@@ -38,12 +35,12 @@ RESULT_ITR_WINDOW_THRESH=3
 IGNORE_TSS_SEQ_THRESH=35
 
 
-sequence_map = src.readSequenceFile.sequence_map
-keys = sequence_map.keys()
+# sequence_map = src.readSequenceFile.sequence_map
+# keys = sequence_map.keys()
 
-def iterateSequences(keys):
-    for key in keys:
-        parameters['normalized_params_map'][key] = calculateParameters(key)
+def iterateSequences(sequence_map):
+    for key in sequence_map.keys():
+        parameters['normalized_params_map'][key] = calculateParameters(key,sequence_map)
         parameters['combined_params_map']['energyDecreasing_params'][key] = combineStructEnergyParams(key, energyDecreasing_params)
         parameters['combined_params_map']['energyIncreasing_params'][key] = combineStructEnergyParams(key, energyIncreasing_params)
         parameters['combined_params_map']['structuralIncreasing_params'][key] = combineStructEnergyParams(key, structuralIncreasing_params)
@@ -91,9 +88,9 @@ def calculateMovingAverages(key, param_map):
     moving_win_size = MOVING_AVG_WINDOW_SIZE
     moving_param_map = {}
     for k,v in param_map.items():
-        arr = param_map[k]
+        arr = v
         try:
-            print(moving_param_map[k])
+            moving_param_map[k]
         except KeyError:
             moving_param_map[k] = []
         for i in range(0, len(arr)-moving_win_size):
@@ -115,15 +112,12 @@ def normalizeMovingAverages(key, moving_param_map):
             normalized_map[k]
         except KeyError:
             normalized_map[k] = []
-        # print(len(arr))
-        # sys.exit()
-        # l = int(len(arr))
         for i in arr:
             norm_val = (i-minArr)/range
             normalized_map[k].append(norm_val)
     return normalized_map
 
-def calculateParameters(key):
+def calculateParameters(key,sequence_map):
     b_arr2 = sequence_map[key]
 
     #DEFIING ALL 31 PARAMETERS:
@@ -136,8 +130,8 @@ def calculateParameters(key):
         return
 
     #IF CONSECUTIVE AA OR TT:
-    for m in range(noofbases):
-        if b_arr2[m-1] == 'A' and b_arr2[m] == 'A' or b_arr2[m-1] == 'T' and b_arr2[m] == 'T':
+    for m in range(noofbases-1):
+        if b_arr2[m] == 'A' and b_arr2[m+1] == 'A' or b_arr2[m] == 'T' and b_arr2[m+1] == 'T':
             a = -0.24586
             b = 0.004276
             c = -0.61382
@@ -170,7 +164,7 @@ def calculateParameters(key):
             ad = -26.71
             ae = -171.84
             assign_params(param_map,a,b,c,d,e,f,g,h,i,j,k,l,ma,n,o,p,q,r,s,t,u,v,w,x,y,z,aa,ab,ac,ad,ae)
-        elif (b_arr2[m - 1] == 'G' and b_arr2[m] == 'G' or (b_arr2[m - 1] == 'C' and b_arr2[m] == 'C')):
+        elif (b_arr2[m] ==  'G' and b_arr2[m+1] == 'G' or (b_arr2[m] ==  'C' and b_arr2[m+1] == 'C')):
             a = 0.584605
             b = -0.07763
             c = 9.909211
@@ -203,7 +197,7 @@ def calculateParameters(key):
             ad = -26.28
             ae = -166.76
             assign_params(param_map,a,b,c,d,e,f,g,h,i,j,k,l,ma,n,o,p,q,r,s,t,u,v, w, x, y,z,aa,ab,ac,ad,ae)
-        elif ((b_arr2[m-1].upper() == 'T') and (b_arr2[m].upper() == 'A')):
+        elif ((b_arr2[m].upper() == 'T') and (b_arr2[m+1].upper() == 'A')):
             a = 0.101842
             b = -0.28579
             c = 0.547368
@@ -236,7 +230,7 @@ def calculateParameters(key):
             ad = -26.9
             ae = -174.35
             assign_params(param_map,a,b,c,d,e,f,g,h,i,j,k,l,ma,n,o,p,q,r,s,t,u,v,w,x,y,z,aa,ab,ac,ad,ae)
-        elif(b_arr2[m-1].upper()=='C' and b_arr2[m].upper()=='G'):
+        elif(b_arr2[m].upper()=='C' and b_arr2[m+1].upper()=='G'):
             a = 0.70475
             b = 0.060125
             c = 2.910625
@@ -269,7 +263,7 @@ def calculateParameters(key):
             ad = -27.93
             ae = -176.88
             assign_params(param_map,a,b,c,d,e,f,g,h,i,j,k,l,ma,n,o,p,q,r,s,t,u,v,w,x,y,z,aa,ab,ac,ad,ae)
-        elif (b_arr2[m - 1].upper() == 'G' and b_arr2[m].upper() == 'C'):
+        elif b_arr2[m].upper() == 'G' and b_arr2[m+1].upper() == 'C':
             a = 0.593382
             b = 0.082647
             c = 0.364706
@@ -302,7 +296,7 @@ def calculateParameters(key):
             ad = -28.13
             ae = -165.58
             assign_params(param_map,a,b,c,d,e,f,g,h,i,j,k,l,ma,n,o,p,q,r,s,t,u,v,w,x,y,z,aa,ab,ac,ad,ae)
-        elif (b_arr2[m - 1].upper() == 'A' and b_arr2[m].upper() == 'T'):
+        elif (b_arr2[m].upper() == 'A' and b_arr2[m+1].upper() == 'T'):
             a = -0.17819
             b = -0.02597
             c = -0.25972
@@ -336,7 +330,7 @@ def calculateParameters(key):
             ae = -173.7
             assign_params(param_map, a, b, c, d, e, f, g, h, i, j, k, l, ma, n, o, p, q, r, s, t, u, v, w, x, y, z, aa, ab,
                           ac, ad, ae)
-        elif(b_arr2[m-1]=='A' and b_arr2[m] == 'C') or (b_arr2[m-1] == 'G' and b_arr2[m] == 'T'):
+        elif(b_arr2[m]=='A' and b_arr2[m+1] == 'C') or (b_arr2[m] == 'G' and b_arr2[m+1] == 'T'):
             a = -0.03125
             b = -0.0505
             c = 0.68
@@ -370,7 +364,7 @@ def calculateParameters(key):
             ae = -171.11
             assign_params(param_map, a, b, c, d, e, f, g, h, i, j, k, l, ma, n, o, p, q, r, s, t, u, v, w, x, y, z, aa, ab,
                           ac, ad, ae)
-        elif (b_arr2[m - 1] == 'C' and b_arr2[m] == 'A') or (b_arr2[m - 1] == 'T' and b_arr2[m] == 'G'):
+        elif (b_arr2[m] ==  'C' and b_arr2[m+1] == 'A') or (b_arr2[m] ==  'T' and b_arr2[m+1] == 'G'):
             a = 0.311563
             b = -0.0675
             c = 3.004688
@@ -404,7 +398,7 @@ def calculateParameters(key):
             ae = -179.01
             assign_params(param_map, a, b, c, d, e, f, g, h, i, j, k, l, ma, n, o, p, q, r, s, t, u, v, w,x, y, z, aa, ab,
                           ac, ad, ae)
-        elif (b_arr2[m - 1] == 'A' and b_arr2[m] == 'G') or (b_arr2[m - 1] == 'C' and b_arr2[m] == 'T'):
+        elif (b_arr2[m] ==  'A' and b_arr2[m+1] == 'G') or (b_arr2[m] ==  'C' and b_arr2[m+1] == 'T'):
             a = 0.485909
             b = -0.02864
             c = 1.825
@@ -438,7 +432,7 @@ def calculateParameters(key):
             ae = -174.93
             assign_params(param_map, a, b, c, d, e, f, g, h, i, j, k, l, ma, n, o, p, q, r, s, t, u, v, w, x, y, z, aa, ab,
                           ac, ad, ae)
-        elif (b_arr2[m - 1] == 'G' and b_arr2[m] == 'A') or (b_arr2[m - 1] == 'T' and b_arr2[m] == 'C'):
+        elif (b_arr2[m] ==  'G' and b_arr2[m+1] == 'A') or (b_arr2[m] ==  'T' and b_arr2[m+1] == 'C'):
             a = -0.15833
             b = 0.08
             c = 0.525926
@@ -472,7 +466,7 @@ def calculateParameters(key):
             ae = -167.6
             assign_params(param_map, a, b, c, d, e, f, g, h, i, j, k, l, ma, n, o, p, q, r, s, t, u, v, w, x, y, z, aa, ab,
                           ac, ad, ae)
-        elif (b_arr2[m-1]=='A' and b[m] == 'N'):
+        elif (b_arr2[m]=='A' and b[m] == 'N'):
             a = 0.217
             b = -0.031
             c = 1.889
@@ -506,7 +500,7 @@ def calculateParameters(key):
             ae = -172.176
             assign_params(param_map, a, b, c, d, e, f, g, h, i, j, k, l, ma, n, o, p, q, r, s, t, u, v, w, x, y, z, aa, ab,
                           ac, ad, ae)
-        elif b_arr2[m-1] == 'T' and b_arr2[m] == "N":
+        elif b_arr2[m] == 'T' and b_arr2[m+1] == "N":
             a = 0.217
             b = -0.031
             c = 1.889
@@ -541,7 +535,7 @@ def calculateParameters(key):
             assign_params(param_map, a, b, c, d, e, f, g, h, i, j, k, l, ma, n, o, p, q, r, s, t, u, v, w, x, y, z, aa, ab,
                           ac, ad, ae)
 
-        elif (b_arr2[m-1]== 'G' and b_arr2[m] == 'N'):
+        elif (b_arr2[m]== 'G' and b_arr2[m+1] == 'N'):
             a = 0.217
             b = -0.031
             c = 1.889
@@ -575,7 +569,7 @@ def calculateParameters(key):
             ae = -172.176
             assign_params(param_map, a, b, c, d, e, f, g, h, i, j, k, l, ma, n, o, p, q, r, s, t, u, v, w, x, y, z, aa, ab,
                           ac, ad, ae)
-        elif(b_arr2[m-1]=='C' and b_arr2[m]=='N'):
+        elif(b_arr2[m]=='C' and b_arr2[m+1]=='N'):
             a = 0.217
             b = -0.031
             c = 1.889
@@ -610,7 +604,7 @@ def calculateParameters(key):
 
             assign_params(param_map, a, b, c, d, e, f, g, h, i, j, k, l, ma, n, o, p, q, r, s, t, u, v, w, x, y, z, aa, ab,
                           ac, ad, ae)
-        elif(b_arr2[m-1] == 'N' and b_arr2[m] == 'A'):
+        elif(b_arr2[m] == 'N' and b_arr2[m+1] == 'A'):
             a = 0.217
             b = -0.031
             c = 1.889
@@ -644,7 +638,7 @@ def calculateParameters(key):
             ae = -172.176
             assign_params(param_map, a, b, c, d, e, f, g, h, i, j, k, l, ma, n, o, p, q, r, s, t, u, v, w, x, y, z, aa, ab,
                           ac, ad, ae)
-        elif (b_arr2[m - 1] == 'N' and b_arr2[m] == 'T'):
+        elif (b_arr2[m] ==  'N' and b_arr2[m+1] == 'T'):
             a = 0.217
             b = -0.031
             c = 1.889
@@ -678,7 +672,7 @@ def calculateParameters(key):
             ae = -172.176
             assign_params(param_map, a, b, c, d, e, f, g, h, i, j, k, l, ma, n, o, p, q, r, s, t, u, v, w, x, y, z, aa, ab,
                           ac, ad, ae)
-        elif (b_arr2[m - 1] == 'N' and b_arr2[m] == 'G'):
+        elif (b_arr2[m] ==  'N' and b_arr2[m+1] == 'G'):
             a = 0.217
             b = -0.031
             c = 1.889
@@ -712,7 +706,7 @@ def calculateParameters(key):
             ae = -172.176
             assign_params(param_map, a, b, c, d, e, f, g, h, i, j, k, l, ma, n, o, p, q, r, s, t, u, v, w, x, y, z, aa, ab,
                           ac, ad, ae)
-        elif (b_arr2[m - 1] == 'N' and b_arr2[m] == 'C'):
+        elif (b_arr2[m] ==  'N' and b_arr2[m+1] == 'C'):
             a = 0.217
             b = -0.031
             c = 1.889
@@ -747,7 +741,7 @@ def calculateParameters(key):
 
             assign_params(param_map, a, b, c, d, e, f, g, h, i, j, k, l, ma, n, o, p, q, r, s, t, u, v, w, x, y, z, aa, ab,
                       ac, ad, ae)
-        elif (b_arr2[m-1]=='N' and b_arr2[m] == 'N'):
+        elif (b_arr2[m]=='N' and b_arr2[m+1] == 'N'):
             a = 0.217
             b = -0.031
             c = 1.889
@@ -784,8 +778,6 @@ def calculateParameters(key):
     return calculateMovingAverages(key,param_map)
 
 def combineStructEnergyParams(key, array):
-    # print (len(parameters['normalized_params_map'][key])) ====31
-    # sys.exit()
     normalized_map = parameters['normalized_params_map'][key]
     map = {}
     for k in array:

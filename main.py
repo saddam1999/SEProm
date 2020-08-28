@@ -1,4 +1,5 @@
 from src import readSequenceFile, getParameterDetails, pcaRegressionAlgorithm
+import sys
 filepath = "Test_Seq.txt"
 try:
     f =open(filepath)
@@ -11,14 +12,15 @@ except NameError:
     writeFilePath = str(raw_input("Please enter the output file path."))
 
 sequence_map = readSequenceFile.readSequenceFile(filepath)
-# print (sequence_map)
-keys = sequence_map.keys()
+# print (sequence_map.keys())
+
+parameter_map = {}
 try:
-    parameter_map = getParameterDetails.iterateSequences(keys)
+    parameter_map = getParameterDetails.iterateSequences(sequence_map)
 except:
     print("Could not load parameters")
 
-map_pca = pcaRegressionAlgorithm.iterateSequences(parameter_map)
+# map_pca = pcaRegressionAlgorithm.iterateSequences(parameter_map)
 # try:
 #     getParameterDetails.iterateSequences(keys)
 # except:
