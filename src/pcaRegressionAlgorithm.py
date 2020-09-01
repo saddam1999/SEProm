@@ -22,35 +22,34 @@ IGNORE_TSS_SEQ_THRESH = 35
 
 
 def iterateSequences(param_map):
-    # print(param_map)
     final_result = {}
     normalized_map = param_map['normalized_params_map']
-    print(normalized_map.keys())
-
-    import sys
-    sys.exit()
+    # print(len(normalized_map[0]['aa']))
     for seq in normalized_map:
-        final_result[seq] = iterate(seq,param_map)
+        final_result[seq] = iterate(seq,normalized_map)
     return final_result
 
-def iterate(seq,param_map):
+def iterate(seq,normalized_map):
     print("Running PCA_Reg algo on sequence = ",seq)
-    normalized_map = param_map['normalized_params_map']
+    # normalized_map = param_map['normalized_params_map']
     params_map = normalized_map[seq]
     params = params_map.keys()
+    # print(params)
     length = len(params_map[params[0]])
+    # print (length)
     i = 0
     seq_40_map = {}
     seq_80_map = {}
     seq_100_map = {}
 
-    while (i + ITR_WINDOW_SIZE) <= (length + ITR_WINDOW_SIZE - 1):
+    for i in range(0,length-ITR_WINDOW_SIZE-ITR_WINDOW_SIZE-NO_TSS_WINDOW_LENGTH, SKIP_WINDOW):
         tss_motif_start = i
         tss_motif_stop = tss_motif_start + ITR_WINDOW_SIZE
         no_tss_motif_start = tss_motif_stop + NO_TSS_WINDOW_LENGTH
         no_tss_motif_stop = no_tss_motif_start + ITR_WINDOW_SIZE
         tss_window_40_arr = extractWindowx(tss_motif_start, tss_motif_stop, params, params_map,40)
         no_tss_window_40_arr = extractWindowx(no_tss_motif_start, no_tss_motif_stop, params, params_map,40)
+        # print("-------------------DONE--------------------")
 
         tss_window_80_arr = extractWindowx(tss_motif_start, tss_motif_stop, params, params_map,80)
         no_tss_window_80_arr = extractWindowx(no_tss_motif_start, no_tss_motif_stop, params, params_map,80)
@@ -69,29 +68,35 @@ def iterate(seq,param_map):
         seq_100_map[tss_motif_start] = []
         seq_100_map[tss_motif_start].append(tss_window_100_arr)
         seq_100_map[tss_motif_start].append(no_tss_window_100_arr)
-
-        i += SKIP_WINDOW
+    print (seq_40_map[tss_motif_start][0])
+    import sys
+    sys.exit()
+    # print (no_tss_motif_stop)
     return predictPCA(seq, seq_40_map, seq_80_map, seq_100_map)
 
 def extractWindow(start, stop, params, params_map):
     arr = []
     for p in params:
         param_arr = params_map[p]
-        sum = 0
+        # print (param_arr)
+        sum = 0.0
         length = 0
         itr_undefined = 0
-        for i in range(start, stop+1):
-            if param_arr[i]:
-                continue
-            else:
-                itr_undefined+=1
-                sum += param_arr[i]
+        for i in range(start, stop):
+            # print (i)
+            try:
+                param_arr[i]
+            except:
+                print("index error at", i)
+            if param_arr[i]==None:
+                itr_undefined += 1
+            sum = sum+ param_arr[i]
             length+=1
-        print round((sum/length))
-        import sys
-        sys.exit()
-        number = int(round(sum / length),6)
-        arr.append(int(round(number / length),6))
+        # print (float(sum)/float(length))
+        number = round(sum / length,6)
+        # print (number)
+        arr.append(round(number / length,6))
+    # print (arr)
     return arr
 
 def extractWindowx(motif_start, motif_stop, params, params_map,x):

@@ -17,10 +17,11 @@ sequence_map = readSequenceFile.readSequenceFile(filepath)
 parameter_map = {}
 try:
     parameter_map = getParameterDetails.iterateSequences(sequence_map)
+    # print (parameter_map.keys())
 except:
     print("Could not load parameters")
 
-# map_pca = pcaRegressionAlgorithm.iterateSequences(parameter_map)
+map_pca = pcaRegressionAlgorithm.iterateSequences(parameter_map)
 # try:
 #     getParameterDetails.iterateSequences(keys)
 # except:
