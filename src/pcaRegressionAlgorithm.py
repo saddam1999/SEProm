@@ -68,9 +68,7 @@ def iterate(seq,normalized_map):
         seq_100_map[tss_motif_start] = []
         seq_100_map[tss_motif_start].append(tss_window_100_arr)
         seq_100_map[tss_motif_start].append(no_tss_window_100_arr)
-    print (seq_40_map[tss_motif_start][0])
-    import sys
-    sys.exit()
+    print (len(seq_100_map))
     # print (no_tss_motif_stop)
     return predictPCA(seq, seq_40_map, seq_80_map, seq_100_map)
 
@@ -106,8 +104,12 @@ def extractWindowx(motif_start, motif_stop, params, params_map,x):
 
 def predictPCA(seq, seq_40_map, seq_80_map, seq_100_map):
     for start in seq_40_map:
+        # print(seq_40_map[start][0])
         seq_40_map[start][0] = pca.getPCAs(seq_40_map[start][0], pca_equations.window_40)
+        # print(seq_40_map[start][0])
         seq_40_map[start][1] = pca.getPCAs(seq_40_map[start][1], pca_equations.window_40)
+        # print(seq_40_map[start][1])
+
     for start in seq_80_map:
         seq_80_map[start][0] = pca.getPCAs(seq_80_map[start][0], pca_equations.window_80)
         seq_80_map[start][1] = pca.getPCAs(seq_80_map[start][1], pca_equations.window_80)
@@ -126,7 +128,6 @@ def predictRegression(seq, seq_40_map, seq_80_map, seq_100_map):
     for start in seq_100_map:
         seq_100_map[start][0] = lr.predict(seq_100_map[start][0], reg_equations.window_100, WINDOW_100_PROB)
         seq_100_map[start][1] = lr.predict(seq_100_map[start][1], reg_equations.window_100, WINDOW_100_PROB)
-
     return processResults(seq, seq_40_map, seq_80_map, seq_100_map)
 
 def processResults(seq, seq_40_map, seq_80_map, seq_100_map):

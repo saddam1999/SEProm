@@ -1,5 +1,6 @@
-from src import readSequenceFile, getParameterDetails, pcaRegressionAlgorithm
+from src import readSequenceFile, getParameterDetails, pcaRegressionAlgorithm, motifsAlgorithm
 import sys
+
 filepath = "Test_Seq.txt"
 try:
     f =open(filepath)
@@ -22,7 +23,5 @@ except:
     print("Could not load parameters")
 
 map_pca = pcaRegressionAlgorithm.iterateSequences(parameter_map)
-# try:
-#     getParameterDetails.iterateSequences(keys)
-# except:
-#     print("Error in calculating parameters")
+# print(map_pca)
+map_motif = motifsAlgorithm.iterateSequences()
