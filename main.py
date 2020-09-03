@@ -1,4 +1,5 @@
 from src import readSequenceFile, getParameterDetails, pcaRegressionAlgorithm, motifsAlgorithm
+
 import sys
 
 filepath = "Test_Seq.txt"
@@ -24,4 +25,4 @@ except:
 
 map_pca = pcaRegressionAlgorithm.iterateSequences(parameter_map)
 # print(map_pca)
-map_motif = motifsAlgorithm.iterateSequences()
+map_motif = motifsAlgorithm.iterateSequences(parameter_map)

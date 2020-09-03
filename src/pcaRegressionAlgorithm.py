@@ -68,7 +68,6 @@ def iterate(seq,normalized_map):
         seq_100_map[tss_motif_start] = []
         seq_100_map[tss_motif_start].append(tss_window_100_arr)
         seq_100_map[tss_motif_start].append(no_tss_window_100_arr)
-    print (len(seq_100_map))
     # print (no_tss_motif_stop)
     return predictPCA(seq, seq_40_map, seq_80_map, seq_100_map)
 
