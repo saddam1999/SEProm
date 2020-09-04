@@ -1,3 +1,6 @@
+import principalComponentAnalysis as pca
+from lib import pcaEquations as pca_equations
+
 MOVING_AVG_WINDOW_SIZE = 25
 NO_TSS_WINDOW_LENGTH = 200
 MOTIFS_NO_TSS_WINDOW_LENGTH = 200
@@ -25,21 +28,28 @@ motifs_size = [[8,10,18],[8,8,10,13],[12,10,10,12],[12,10,10,14]]
 motifs_dist_end = [[19,42,85],[18,41,52,65],[22,42,55,71],[18,42,55,73]]
 
 def extractWindow(tss_start, tss_stop, motif, dist_end, struct_ener_map):
+    # print (struct_ener_map)
     motif_start = tss_stop - dist_end
     motif_stop = motif_start + motif - 1
+    # print(motif_start,motif_stop)
     params_arr = []
-    for k in struct_ener_map:
+    for k in struct_ener_map.keys():
+        # print k
         obj = struct_ener_map[k]
+        # print len(obj)
         sum = 0
         length = 0
         itr_undefined = 0
         for i in range(motif_start, motif_stop+1):
-            if obj[i] == None:
-                # obj[i]
+            try:
+                obj[i]
+                sum += float(obj[i])
+                length += 1
+            except:
                 itr_undefined += 1
-            sum+=float(obj[i])
-            length+=1
-        params_arr.append(sum/length)
+        if length!=0:
+            params_arr.append(sum/length)
+    # print params_arr
     return params_arr
 
 def transformStructMap(struct_map):
@@ -65,20 +75,88 @@ def iterate(seq, parameters_map):
     print("Running Motifs algorithm on sequence: ",seq)
     motif_map = {}
     struct_ener_map = parameters_map['combined_params_map'][seq]
-    # print(seq)
+    # print(struct_ener_map)
     params = struct_ener_map.keys()
-    print (params)
-
+    # print(params)
     length = len(struct_ener_map[params[0]].keys())
-    print(length)
-    for i in range(0,length):
+    # print(length)
+    # for i in range(0,length, SKIP_WINDOW):
+        # print(i)
+    i=0
+    while (i+ITR_WINDOW_SIZE)<=length+ITR_WINDOW_SIZE:
+        # print (i)
         tss_motif_start = i
         tss_motif_stop = tss_motif_start + ITR_WINDOW_SIZE
         no_tss_motif_start = tss_motif_stop + MOTIFS_NO_TSS_WINDOW_LENGTH
         no_tss_motif_stop = no_tss_motif_start + ITR_WINDOW_SIZE
         # print(tss_motif_start, tss_motif_stop, no_tss_motif_stop, no_tss_motif_start)
-        if motif_map[tss_motif_start] == None:
+        try:
+            (motif_map[tss_motif_start])
+        except:
             motif_map[tss_motif_start] = {}
+        for k in range(len(motifs_size)):
+            motif_size = motifs_size[k]
+            motif_dist_end = motifs_dist_end[k]
+            for j in range(len(motif_size)):
+                motif = motif_size[j]
+                dist_end = motif_dist_end[j]
+                try:
+                    motif_map[tss_motif_start]['m_'+str(k)]
+                except:
+                    motif_map[tss_motif_start]['m_' + str(k)] = {}
+                try:
+                    (motif_map[tss_motif_start]['m_' + str(k)][j])
+                except:
+                    motif_map[tss_motif_start]['m_' + str(k)][j] = {}
+                motif_map[tss_motif_start]['m_' + str(k)][j][1] = extractWindow(tss_motif_start, tss_motif_stop,motif, dist_end, struct_ener_map)
+                motif_map[tss_motif_start]['m_' + str(k)][j][0] = extractWindow(no_tss_motif_start,no_tss_motif_stop, motif, dist_end,struct_ener_map)
+        i+= SKIP_WINDOW
+    # print(motif_map)
+    parameters_map['combined_params_map'][seq] = {}
+    predictPCA(seq,motif_map)
 
-        # len = Object.keys(struct_ener_map[params[0]]).length;
 
+def predictPCA(seq, motif_map):
+    for start in motif_map.keys():
+        # print(motif_map)
+        motif_map[start]['m_0'][0][1] = pca.getPCAs(motif_map[start]['m_0'][0][1], pca_equations.m_0_0)
+        motif_map[start]['m_0'][0][0] = pca.getPCAs(motif_map[start]['m_0'][0][0], pca_equations.m_0_0)
+        motif_map[start]['m_0'][1][1] = pca.getPCAs(motif_map[start]['m_0'][1][1], pca_equations.m_0_1)
+        motif_map[start]['m_0'][1][0] = pca.getPCAs(motif_map[start]['m_0'][1][0], pca_equations.m_0_1)
+        motif_map[start]['m_0'][2][1] = pca.getPCAs(motif_map[start]['m_0'][2][1], pca_equations.m_0_2)
+        motif_map[start]['m_0'][2][0] = pca.getPCAs(motif_map[start]['m_0'][2][0], pca_equations.m_0_2)
+
+        motif_map[start]['m_1'][0][1] = pca.getPCAs(motif_map[start]['m_1'][0][1], pca_equations.m_1_0)
+        motif_map[start]['m_1'][0][0] = pca.getPCAs(motif_map[start]['m_1'][0][0], pca_equations.m_1_0)
+        motif_map[start]['m_1'][1][1] = pca.getPCAs(motif_map[start]['m_1'][1][1], pca_equations.m_1_1)
+        motif_map[start]['m_1'][1][0] = pca.getPCAs(motif_map[start]['m_1'][1][0], pca_equations.m_1_1)
+        motif_map[start]['m_1'][2][1] = pca.getPCAs(motif_map[start]['m_1'][2][1], pca_equations.m_1_2)
+        motif_map[start]['m_1'][2][0] = pca.getPCAs(motif_map[start]['m_1'][2][0], pca_equations.m_1_2)
+        motif_map[start]['m_1'][3][1] = pca.getPCAs(motif_map[start]['m_1'][3][1], pca_equations.m_1_3)
+        motif_map[start]['m_1'][3][0] = pca.getPCAs(motif_map[start]['m_1'][3][0], pca_equations.m_1_3)
+
+        motif_map[start]['m_2'][0][1] = pca.getPCAs(motif_map[start]['m_2'][0][1], pca_equations.m_2_0)
+        motif_map[start]['m_2'][0][0] = pca.getPCAs(motif_map[start]['m_2'][0][0], pca_equations.m_2_0)
+        motif_map[start]['m_2'][1][1] = pca.getPCAs(motif_map[start]['m_2'][1][1], pca_equations.m_2_1)
+        motif_map[start]['m_2'][1][0] = pca.getPCAs(motif_map[start]['m_2'][1][0], pca_equations.m_2_1)
+        motif_map[start]['m_2'][2][1] = pca.getPCAs(motif_map[start]['m_2'][2][1], pca_equations.m_2_2)
+        motif_map[start]['m_2'][2][0] = pca.getPCAs(motif_map[start]['m_2'][2][0], pca_equations.m_2_2)
+        motif_map[start]['m_2'][3][1] = pca.getPCAs(motif_map[start]['m_2'][3][1], pca_equations.m_2_3)
+        motif_map[start]['m_2'][3][0] = pca.getPCAs(motif_map[start]['m_2'][3][0], pca_equations.m_2_3)
+
+        motif_map[start]['m_3'][0][1] = pca.getPCAs(motif_map[start]['m_3'][0][1], pca_equations.m_3_0)
+        motif_map[start]['m_3'][0][0] = pca.getPCAs(motif_map[start]['m_3'][0][0], pca_equations.m_3_0)
+        motif_map[start]['m_3'][1][1] = pca.getPCAs(motif_map[start]['m_3'][1][1], pca_equations.m_3_1)
+        motif_map[start]['m_3'][1][0] = pca.getPCAs(motif_map[start]['m_3'][1][0], pca_equations.m_3_1)
+        motif_map[start]['m_3'][2][1] = pca.getPCAs(motif_map[start]['m_3'][2][1], pca_equations.m_3_2)
+        motif_map[start]['m_3'][2][0] = pca.getPCAs(motif_map[start]['m_3'][2][0], pca_equations.m_3_2)
+        motif_map[start]['m_3'][3][1] = pca.getPCAs(motif_map[start]['m_3'][3][1], pca_equations.m_3_3)
+        motif_map[start]['m_3'][3][0] = pca.getPCAs(motif_map[start]['m_3'][3][0], pca_equations.m_3_3)
+
+    return predictRegression(seq,motif_map)
+
+def predictRegression(seq,motif_map):
+    for start in motif_map.keys():
+        print("in predictRegression now")
+        import sys
+        sys.exit()

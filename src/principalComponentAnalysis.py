@@ -1,4 +1,9 @@
 def getPCAs(data_arr, equation_map):
+    print(equation_map.keys())
+
+
+    import sys
+    sys.exit()
     axis_arr = []
     # print(equation_map)
     for key in equation_map:

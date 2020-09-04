@@ -8,10 +8,10 @@ try:
 except NameError:
     filepath = str(raw_input("Please enter the input sequence file."))
 
-try:
-    f = open(writeFilePath)
-except NameError:
-    writeFilePath = str(raw_input("Please enter the output file path."))
+# try:
+#     f = open(writeFilePath)
+# except NameError:
+#     writeFilePath = str(raw_input("Please enter the output file path."))
 
 sequence_map = readSequenceFile.readSequenceFile(filepath)
 # print (sequence_map.keys())
