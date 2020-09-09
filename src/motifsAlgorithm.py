@@ -67,7 +67,7 @@ def iterateSequences(parameters_map):
     final_result = {}
     combined_params_map = parameters_map['combined_params_map']
     for seq in combined_params_map:
-        # print(seq)
+        print(seq)
         final_result[seq] = iterate(seq, parameters_map)
     return final_result
 
@@ -75,7 +75,7 @@ def iterate(seq, parameters_map):
     print("Running Motifs algorithm on sequence: ",seq)
     motif_map = {}
     struct_ener_map = parameters_map['combined_params_map'][seq]
-    # print(struct_ener_map)
+    print(struct_ener_map)
     params = struct_ener_map.keys()
     # print(params)
     length = len(struct_ener_map[params[0]].keys())
@@ -118,7 +118,6 @@ def iterate(seq, parameters_map):
 
 def predictPCA(seq, motif_map):
     for start in motif_map.keys():
-        # print(motif_map)
         motif_map[start]['m_0'][0][1] = pca.getPCAs(motif_map[start]['m_0'][0][1], pca_equations.m_0_0)
         motif_map[start]['m_0'][0][0] = pca.getPCAs(motif_map[start]['m_0'][0][0], pca_equations.m_0_0)
         motif_map[start]['m_0'][1][1] = pca.getPCAs(motif_map[start]['m_0'][1][1], pca_equations.m_0_1)

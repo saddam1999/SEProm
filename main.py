@@ -24,5 +24,5 @@ except:
     print("Could not load parameters")
 
 map_pca = pcaRegressionAlgorithm.iterateSequences(parameter_map)
-# print(map_pca)
+
 map_motif = motifsAlgorithm.iterateSequences(parameter_map)

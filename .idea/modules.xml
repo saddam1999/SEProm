@@ -2,7 +2,6 @@
 <project version="4">
   <component name="ProjectModuleManager">
     <modules>
-      <module fileurl="file://$PROJECT_DIR$/../../VoxelGrids/Python_gfeRecon/.idea/Python_gfeRecon.iml" filepath="$PROJECT_DIR$/../../VoxelGrids/Python_gfeRecon/.idea/Python_gfeRecon.iml" />
       <module fileurl="file://$PROJECT_DIR$/.idea/SEProm.iml" filepath="$PROJECT_DIR$/.idea/SEProm.iml" />
     </modules>
   </component>
