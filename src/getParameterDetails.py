@@ -34,6 +34,7 @@ RESULT_ITR_WINDOW=5
 RESULT_ITR_WINDOW_THRESH=3
 IGNORE_TSS_SEQ_THRESH=35
 
+params_dict = {'a':0, 'b':0,'c': 0, 'd':0}
 
 # sequence_map = src.readSequenceFile.sequence_map
 # keys = sequence_map.keys()
@@ -48,7 +49,6 @@ def iterateSequences(sequence_map):
 
     parameters['combined_params_map'] = transformStructEnerMap(parameters['combined_params_map'])
     return parameters
-
 
 def assign_params(param_map,a, b, c, d, e, f, g, h, i, j, k, l, ma, n, o, p, q, r, s, t, u, v, w, x, y, z, aa, ab, ac, ad, ae):
     param_map['a'].append(a)

@@ -1,11 +1,13 @@
 import principalComponentAnalysis as pca
 from lib import pcaEquations as pca_equations
+from lib import regEquations as reg_equations
+import src.logisticRegression as lr
 
 MOVING_AVG_WINDOW_SIZE = 25
 NO_TSS_WINDOW_LENGTH = 200
 MOTIFS_NO_TSS_WINDOW_LENGTH = 200
 ITR_WINDOW_SIZE = 100
-SKIP_WINDOW = 1 #TODO 8 Previous 25
+SKIP_WINDOW = 100 #TODO 8 Previous 25
 SKIP_WINDOW_SEQUENCE = 1
 SKIP_WINDOW_RANGE = 40
 
@@ -29,18 +31,17 @@ motifs_dist_end = [[19,42,85],[18,41,52,65],[22,42,55,71],[18,42,55,73]]
 
 def extractWindow(tss_start, tss_stop, motif, dist_end, struct_ener_map):
     # print (struct_ener_map)
+    # print(tss_stop, dist_end,motif)
     motif_start = tss_stop - dist_end
-    motif_stop = motif_start + motif - 1
+    motif_stop = motif_start + motif
     # print(motif_start,motif_stop)
     params_arr = []
     for k in struct_ener_map.keys():
-        # print k
         obj = struct_ener_map[k]
-        # print len(obj)
         sum = 0
         length = 0
         itr_undefined = 0
-        for i in range(motif_start, motif_stop+1):
+        for i in range(motif_start, motif_stop):
             try:
                 obj[i]
                 sum += float(obj[i])
@@ -49,7 +50,6 @@ def extractWindow(tss_start, tss_stop, motif, dist_end, struct_ener_map):
                 itr_undefined += 1
         if length!=0:
             params_arr.append(sum/length)
-    # print params_arr
     return params_arr
 
 def transformStructMap(struct_map):
@@ -65,25 +65,29 @@ def transformStructMap(struct_map):
 
 def iterateSequences(parameters_map):
     final_result = {}
-    combined_params_map = parameters_map['combined_params_map']
-    for seq in combined_params_map:
-        print(seq)
+    for seq in parameters_map['combined_params_map']:
         final_result[seq] = iterate(seq, parameters_map)
+        import sys
+        sys.exit()
     return final_result
 
 def iterate(seq, parameters_map):
     print("Running Motifs algorithm on sequence: ",seq)
     motif_map = {}
     struct_ener_map = parameters_map['combined_params_map'][seq]
-    print(struct_ener_map)
+    # print(struct_ener_map)
     params = struct_ener_map.keys()
     # print(params)
     length = len(struct_ener_map[params[0]].keys())
-    # print(length)
-    # for i in range(0,length, SKIP_WINDOW):
-        # print(i)
     i=0
-    while (i+ITR_WINDOW_SIZE)<=length+ITR_WINDOW_SIZE:
+    # arr = [i for i in range(length)]
+    # print(arr)
+    # import sys
+    # sys.exit()
+    no_tss_motif_stop = 0
+    # while(no_tss_motif_stop<length-1):
+
+    for i in range(0, length - ITR_WINDOW_SIZE - ITR_WINDOW_SIZE - NO_TSS_WINDOW_LENGTH, SKIP_WINDOW):
         # print (i)
         tss_motif_start = i
         tss_motif_stop = tss_motif_start + ITR_WINDOW_SIZE
@@ -108,54 +112,131 @@ def iterate(seq, parameters_map):
                     (motif_map[tss_motif_start]['m_' + str(k)][j])
                 except:
                     motif_map[tss_motif_start]['m_' + str(k)][j] = {}
-                motif_map[tss_motif_start]['m_' + str(k)][j][1] = extractWindow(tss_motif_start, tss_motif_stop,motif, dist_end, struct_ener_map)
-                motif_map[tss_motif_start]['m_' + str(k)][j][0] = extractWindow(no_tss_motif_start,no_tss_motif_stop, motif, dist_end,struct_ener_map)
-        i+= SKIP_WINDOW
-    # print(motif_map)
-    parameters_map['combined_params_map'][seq] = {}
+
+                motif_map[tss_motif_start]['m_' + str(k)][j]['tss'] = extractWindow(tss_motif_start, tss_motif_stop,motif, dist_end, struct_ener_map)
+                motif_map[tss_motif_start]['m_' + str(k)][j]['no_tss'] = extractWindow(no_tss_motif_start,no_tss_motif_stop, motif, dist_end,struct_ener_map)
+
     predictPCA(seq,motif_map)
 
-
 def predictPCA(seq, motif_map):
+
     for start in motif_map.keys():
-        motif_map[start]['m_0'][0][1] = pca.getPCAs(motif_map[start]['m_0'][0][1], pca_equations.m_0_0)
-        motif_map[start]['m_0'][0][0] = pca.getPCAs(motif_map[start]['m_0'][0][0], pca_equations.m_0_0)
-        motif_map[start]['m_0'][1][1] = pca.getPCAs(motif_map[start]['m_0'][1][1], pca_equations.m_0_1)
-        motif_map[start]['m_0'][1][0] = pca.getPCAs(motif_map[start]['m_0'][1][0], pca_equations.m_0_1)
-        motif_map[start]['m_0'][2][1] = pca.getPCAs(motif_map[start]['m_0'][2][1], pca_equations.m_0_2)
-        motif_map[start]['m_0'][2][0] = pca.getPCAs(motif_map[start]['m_0'][2][0], pca_equations.m_0_2)
+        motif_map[start]['m_0'][0]['tss'] = pca.getPCAs(motif_map[start]['m_0'][0]['tss'], pca_equations.m_0_0)
+        motif_map[start]['m_0'][0]['no_tss'] = pca.getPCAs(motif_map[start]['m_0'][0]['no_tss'], pca_equations.m_0_0)
 
-        motif_map[start]['m_1'][0][1] = pca.getPCAs(motif_map[start]['m_1'][0][1], pca_equations.m_1_0)
-        motif_map[start]['m_1'][0][0] = pca.getPCAs(motif_map[start]['m_1'][0][0], pca_equations.m_1_0)
-        motif_map[start]['m_1'][1][1] = pca.getPCAs(motif_map[start]['m_1'][1][1], pca_equations.m_1_1)
-        motif_map[start]['m_1'][1][0] = pca.getPCAs(motif_map[start]['m_1'][1][0], pca_equations.m_1_1)
-        motif_map[start]['m_1'][2][1] = pca.getPCAs(motif_map[start]['m_1'][2][1], pca_equations.m_1_2)
-        motif_map[start]['m_1'][2][0] = pca.getPCAs(motif_map[start]['m_1'][2][0], pca_equations.m_1_2)
-        motif_map[start]['m_1'][3][1] = pca.getPCAs(motif_map[start]['m_1'][3][1], pca_equations.m_1_3)
-        motif_map[start]['m_1'][3][0] = pca.getPCAs(motif_map[start]['m_1'][3][0], pca_equations.m_1_3)
+        motif_map[start]['m_0'][1]['tss'] = pca.getPCAs(motif_map[start]['m_0'][1]['tss'], pca_equations.m_0_1)
+        motif_map[start]['m_0'][1]['no_tss'] = pca.getPCAs(motif_map[start]['m_0'][1]['no_tss'], pca_equations.m_0_1)
+        motif_map[start]['m_0'][2]['tss'] = pca.getPCAs(motif_map[start]['m_0'][2]['tss'], pca_equations.m_0_2)
+        motif_map[start]['m_0'][2]['no_tss'] = pca.getPCAs(motif_map[start]['m_0'][2]['no_tss'], pca_equations.m_0_2)
 
-        motif_map[start]['m_2'][0][1] = pca.getPCAs(motif_map[start]['m_2'][0][1], pca_equations.m_2_0)
-        motif_map[start]['m_2'][0][0] = pca.getPCAs(motif_map[start]['m_2'][0][0], pca_equations.m_2_0)
-        motif_map[start]['m_2'][1][1] = pca.getPCAs(motif_map[start]['m_2'][1][1], pca_equations.m_2_1)
-        motif_map[start]['m_2'][1][0] = pca.getPCAs(motif_map[start]['m_2'][1][0], pca_equations.m_2_1)
-        motif_map[start]['m_2'][2][1] = pca.getPCAs(motif_map[start]['m_2'][2][1], pca_equations.m_2_2)
-        motif_map[start]['m_2'][2][0] = pca.getPCAs(motif_map[start]['m_2'][2][0], pca_equations.m_2_2)
-        motif_map[start]['m_2'][3][1] = pca.getPCAs(motif_map[start]['m_2'][3][1], pca_equations.m_2_3)
-        motif_map[start]['m_2'][3][0] = pca.getPCAs(motif_map[start]['m_2'][3][0], pca_equations.m_2_3)
+        motif_map[start]['m_1'][0]['tss'] = pca.getPCAs(motif_map[start]['m_1'][0]['tss'], pca_equations.m_1_0)
+        motif_map[start]['m_1'][0]['no_tss'] = pca.getPCAs(motif_map[start]['m_1'][0]['no_tss'], pca_equations.m_1_0)
+        motif_map[start]['m_1'][1]['tss'] = pca.getPCAs(motif_map[start]['m_1'][1]['tss'], pca_equations.m_1_1)
+        motif_map[start]['m_1'][1]['no_tss'] = pca.getPCAs(motif_map[start]['m_1'][1]['no_tss'], pca_equations.m_1_1)
+        motif_map[start]['m_1'][2]['tss'] = pca.getPCAs(motif_map[start]['m_1'][2]['tss'], pca_equations.m_1_2)
+        motif_map[start]['m_1'][2]['no_tss'] = pca.getPCAs(motif_map[start]['m_1'][2]['no_tss'], pca_equations.m_1_2)
+        motif_map[start]['m_1'][3]['tss'] = pca.getPCAs(motif_map[start]['m_1'][3]['tss'], pca_equations.m_1_3)
+        motif_map[start]['m_1'][3]['no_tss'] = pca.getPCAs(motif_map[start]['m_1'][3]['no_tss'], pca_equations.m_1_3)
 
-        motif_map[start]['m_3'][0][1] = pca.getPCAs(motif_map[start]['m_3'][0][1], pca_equations.m_3_0)
-        motif_map[start]['m_3'][0][0] = pca.getPCAs(motif_map[start]['m_3'][0][0], pca_equations.m_3_0)
-        motif_map[start]['m_3'][1][1] = pca.getPCAs(motif_map[start]['m_3'][1][1], pca_equations.m_3_1)
-        motif_map[start]['m_3'][1][0] = pca.getPCAs(motif_map[start]['m_3'][1][0], pca_equations.m_3_1)
-        motif_map[start]['m_3'][2][1] = pca.getPCAs(motif_map[start]['m_3'][2][1], pca_equations.m_3_2)
-        motif_map[start]['m_3'][2][0] = pca.getPCAs(motif_map[start]['m_3'][2][0], pca_equations.m_3_2)
-        motif_map[start]['m_3'][3][1] = pca.getPCAs(motif_map[start]['m_3'][3][1], pca_equations.m_3_3)
-        motif_map[start]['m_3'][3][0] = pca.getPCAs(motif_map[start]['m_3'][3][0], pca_equations.m_3_3)
+        motif_map[start]['m_2'][0]['tss'] = pca.getPCAs(motif_map[start]['m_2'][0]['tss'], pca_equations.m_2_0)
+        motif_map[start]['m_2'][0]['no_tss'] = pca.getPCAs(motif_map[start]['m_2'][0]['no_tss'], pca_equations.m_2_0)
+        motif_map[start]['m_2'][1]['tss'] = pca.getPCAs(motif_map[start]['m_2'][1]['tss'], pca_equations.m_2_1)
+        motif_map[start]['m_2'][1]['no_tss'] = pca.getPCAs(motif_map[start]['m_2'][1]['no_tss'], pca_equations.m_2_1)
+        motif_map[start]['m_2'][2]['tss'] = pca.getPCAs(motif_map[start]['m_2'][2]['tss'], pca_equations.m_2_2)
+        motif_map[start]['m_2'][2]['no_tss'] = pca.getPCAs(motif_map[start]['m_2'][2]['no_tss'], pca_equations.m_2_2)
+        motif_map[start]['m_2'][3]['tss'] = pca.getPCAs(motif_map[start]['m_2'][3]['tss'], pca_equations.m_2_3)
+        motif_map[start]['m_2'][3]['no_tss'] = pca.getPCAs(motif_map[start]['m_2'][3]['no_tss'], pca_equations.m_2_3)
 
+        motif_map[start]['m_3'][0]['tss'] = pca.getPCAs(motif_map[start]['m_3'][0]['tss'], pca_equations.m_3_0)
+        motif_map[start]['m_3'][0]['no_tss'] = pca.getPCAs(motif_map[start]['m_3'][0]['no_tss'], pca_equations.m_3_0)
+        motif_map[start]['m_3'][1]['tss'] = pca.getPCAs(motif_map[start]['m_3'][1]['tss'], pca_equations.m_3_1)
+        motif_map[start]['m_3'][1]['no_tss'] = pca.getPCAs(motif_map[start]['m_3'][1]['no_tss'], pca_equations.m_3_1)
+        motif_map[start]['m_3'][2]['tss'] = pca.getPCAs(motif_map[start]['m_3'][2]['tss'], pca_equations.m_3_2)
+        motif_map[start]['m_3'][2]['no_tss'] = pca.getPCAs(motif_map[start]['m_3'][2]['no_tss'], pca_equations.m_3_2)
+        motif_map[start]['m_3'][3]['tss'] = pca.getPCAs(motif_map[start]['m_3'][3]['tss'], pca_equations.m_3_3)
+        motif_map[start]['m_3'][3]['no_tss'] = pca.getPCAs(motif_map[start]['m_3'][3]['no_tss'], pca_equations.m_3_3)
     return predictRegression(seq,motif_map)
 
 def predictRegression(seq,motif_map):
+    # print (motif_map.keys())
     for start in motif_map.keys():
-        print("in predictRegression now")
-        import sys
-        sys.exit()
+        motif_map[start]['m_0'][0]['tss'] = lr.predict(motif_map[start]['m_0'][0]['tss'], reg_equations.m_0_0,MOTIF_PROB)
+        motif_map[start]['m_0'][0]['no_tss'] = lr.predict(motif_map[start]['m_0'][0]['no_tss'], reg_equations.m_0_0,MOTIF_PROB)
+
+        motif_map[start]['m_0'][1]['tss'] = lr.predict(motif_map[start]['m_0'][1]['tss'], reg_equations.m_0_1,MOTIF_PROB)
+        motif_map[start]['m_0'][1]['no_tss'] = lr.predict(motif_map[start]['m_0'][1]['no_tss'], reg_equations.m_0_1,MOTIF_PROB)
+
+        motif_map[start]['m_0'][2]['tss'] = lr.predict(motif_map[start]['m_0'][2]['tss'], reg_equations.m_0_2,MOTIF_PROB)
+        motif_map[start]['m_0'][2]['no_tss'] = lr.predict(motif_map[start]['m_0'][2]['no_tss'], reg_equations.m_0_2,MOTIF_PROB)
+
+        motif_map[start]['m_1'][0]['tss'] = lr.predict(motif_map[start]['m_1'][0]['tss'], reg_equations.m_1_0,MOTIF_PROB)
+        motif_map[start]['m_1'][0]['no_tss'] = lr.predict(motif_map[start]['m_1'][0]['no_tss'], reg_equations.m_1_0,MOTIF_PROB)
+
+        motif_map[start]['m_1'][1]['tss'] = lr.predict(motif_map[start]['m_1'][1]['tss'], reg_equations.m_1_1,MOTIF_PROB)
+        motif_map[start]['m_1'][1]['no_tss'] = lr.predict(motif_map[start]['m_1'][1]['no_tss'], reg_equations.m_1_1,MOTIF_PROB)
+
+        motif_map[start]['m_1'][2]['tss'] = lr.predict(motif_map[start]['m_1'][2]['tss'], reg_equations.m_1_2,MOTIF_PROB)
+        motif_map[start]['m_1'][2]['no_tss'] = lr.predict(motif_map[start]['m_1'][2]['no_tss'], reg_equations.m_1_2,MOTIF_PROB)
+
+        motif_map[start]['m_1'][3]['tss'] = lr.predict(motif_map[start]['m_1'][3]['tss'], reg_equations.m_1_3,MOTIF_PROB)
+        motif_map[start]['m_1'][3]['no_tss'] = lr.predict(motif_map[start]['m_1'][3]['no_tss'], reg_equations.m_1_3,MOTIF_PROB)
+
+        motif_map[start]['m_2'][0]['tss'] = lr.predict(motif_map[start]['m_2'][0]['tss'], reg_equations.m_2_0,MOTIF_PROB)
+        motif_map[start]['m_2'][0]['no_tss'] = lr.predict(motif_map[start]['m_2'][0]['no_tss'], reg_equations.m_2_0,MOTIF_PROB)
+
+        motif_map[start]['m_2'][1]['tss'] = lr.predict(motif_map[start]['m_2'][1]['tss'], reg_equations.m_2_1,MOTIF_PROB)
+        motif_map[start]['m_2'][1]['no_tss'] = lr.predict(motif_map[start]['m_2'][1]['no_tss'], reg_equations.m_2_1,MOTIF_PROB)
+
+        motif_map[start]['m_2'][2]['tss'] = lr.predict(motif_map[start]['m_2'][2]['tss'], reg_equations.m_2_2,MOTIF_PROB)
+        motif_map[start]['m_2'][2]['no_tss'] = lr.predict(motif_map[start]['m_2'][2]['no_tss'], reg_equations.m_2_2,MOTIF_PROB)
+
+        motif_map[start]['m_2'][3]['tss'] = lr.predict(motif_map[start]['m_2'][3]['tss'], reg_equations.m_2_3,MOTIF_PROB)
+        motif_map[start]['m_2'][3]['no_tss'] = lr.predict(motif_map[start]['m_2'][3]['no_tss'], reg_equations.m_2_3,MOTIF_PROB)
+
+        motif_map[start]['m_3'][0]['tss'] = lr.predict(motif_map[start]['m_3'][0]['tss'], reg_equations.m_3_0,MOTIF_PROB)
+        motif_map[start]['m_3'][0]['no_tss'] = lr.predict(motif_map[start]['m_3'][0]['no_tss'], reg_equations.m_3_0,MOTIF_PROB)
+
+        motif_map[start]['m_3'][1]['tss'] = lr.predict(motif_map[start]['m_3'][1]['tss'], reg_equations.m_3_1,MOTIF_PROB)
+        motif_map[start]['m_3'][1]['no_tss'] = lr.predict(motif_map[start]['m_3'][1]['no_tss'], reg_equations.m_3_1,MOTIF_PROB)
+
+        motif_map[start]['m_3'][2]['tss'] = lr.predict(motif_map[start]['m_3'][2]['tss'], reg_equations.m_3_2,MOTIF_PROB)
+        motif_map[start]['m_3'][2]['no_tss'] = lr.predict(motif_map[start]['m_3'][2]['no_tss'], reg_equations.m_3_2,MOTIF_PROB)
+
+        motif_map[start]['m_3'][3]['tss'] = lr.predict(motif_map[start]['m_3'][3]['tss'], reg_equations.m_3_3,MOTIF_PROB)
+        motif_map[start]['m_3'][3]['no_tss'] = lr.predict(motif_map[start]['m_3'][3]['no_tss'], reg_equations.m_3_3,MOTIF_PROB)
+    # print (motif_map)
+    return processResults(seq,motif_map)
+
+def processResults(seq,motif_map):
+    combined_result_map = {}
+    for start in motif_map.keys():
+        row_map = motif_map[start]
+        combined_result_map[start] = {}
+        # print(row_map.keys())
+        for row in row_map.keys():
+            m_map = row_map[row]
+            # print(m_map)
+            combined_result_map[start][row] = {}
+            threshold = len(m_map.keys()) - 1
+            tss = 0
+            no_tss = 0
+            for motif in m_map:
+                tss += m_map[motif]['tss']
+                no_tss += m_map[motif]['no_tss']
+            combined_result_map[start][row]['tss'] = (1 if (tss >= threshold) else 0)
+            combined_result_map[start][row]['no_tss'] = (1 if (no_tss >= threshold) else 0)
+        # print(combined_result_map)
+        # import sys
+        # sys.exit()
+    for start in combined_result_map:
+        tss = 0
+        no_tss = 0
+        result = []
+        for row in combined_result_map[start]:
+            tss += combined_result_map[start][row]['tss']
+            no_tss += combined_result_map[start][row]['no_tss']
+        result.append(1 if (tss > 0) else 0)
+        result.append(1 if (no_tss > 0) else 0)
+        combined_result_map[start] = result
+    print(combined_result_map)
+    return combined_result_map
